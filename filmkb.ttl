@@ -101,6 +101,15 @@
 
     rdfs:comment "Film shorter than 40 minutes" .
 
+:EuropeanFilm a owl:Class ;
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf ( :Film
+            [ a owl:Restriction ;
+                owl:onProperty :producedIn ;
+                owl:someValuesFrom [a owl:Class ;
+                    owl:oneOf ( :France :Italy :Netherlands :Germany)]])];
+    rdfs:comment "Film produced in a European country. More countries can be added".
+
 # Related movie types
 :Remake a owl:Class ; 
     owl:equivalentClass [ a owl:Class ;
@@ -126,8 +135,58 @@
                 owl:someValuesFrom :LiteraryWork])];
     rdfs:comment "Film based on a literary work".
 
+# Age ratings and content warnings
+:AgeRating a owl:Class ; 
+    owl:equivalentClass[ a owl:Class ;
+        owl:oneOf (:Age_AL :Age_6 :Age_9 :Age_12 :Age_14 :Age_16 :Age_18)];
+    rdfs:comment "Age classification for a movie".
+
+:SuitableFor12 a owl:Class ;
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf (:Film
+            [ a owl:Restriction ;
+                owl:onProperty :hasAgeRating ;
+                owl:someValuesFrom [ a owl:Class ;
+                    owl:oneOf ( :Age_AL :Age_6 :Age_9 :Age_12 )]])] ;
+    rdfs:comment "Film suitable for viewers aged 12 and under".
+
+:ContentWarning a owl:Class ;
+    owl:equivalentClass [ a owl:Class ;
+        owl:unionOf ( :MildWarning :SevereWarning)];
+    rdfs:comment "warning about potentially disturbing content".
+
+:MildWarning a owl:Class ;
+    rdfs:subClassOf :ContentWarning ;
+    owl:disjointWith :SevereWarning ;
+    rdfs:content "Content warning of low intensity".
+
+:SevereWarning a owl:Class ; 
+    rdfs:subClassOf :ContentWarning ;
+    rdfs:comment "Content warning of high intensity".
+
+:FamilyFriendlyFilm a owl:Class ;
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf (:Film
+            [ a owl:Restriction ;
+                owl:onProperty :hasContentWarning ;
+                owl:allValuesFrom :MildWarning])];
+    rdfs:comment "Film with only mild content warnings.".
+
+:WarningFreeFilm a owl:Class ;
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf ( :Film
+            [ a owl:Restriction ;
+                owl:onProperty :hasContentWarning ;
+                owl:maxCardinality "0"^^xsd:nonNegativeInteger])];
+    rdfs:comment "Film without any content warning". # use maxCardinality to indicate that the property has no values for this class and excludes subclasses that have non-zero values or no values
 
 # Properties
+
+:hasReleaseYear a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:domain :Film ;
+    rdfs:range xsd:int ;
+    rdfs:comment "Year of first release".
+
 :hasTitle a owl:DatatypeProperty ;
     rdfs:comment "Title of a film" ;
     rdfs:domain :Film ; 
@@ -159,4 +218,46 @@
 :basedOn a owl:ObjectProperty ;
     rdfs:domain :Film ;
     rdfs:range :LiteraryWork ;
-    rdfs:comment "Literary work a film is adapted from"
+    rdfs:comment "Literary work a film is adapted from".
+
+:producedIn a owl:ObjectProperty ;
+    rdfs:domain :Film ;
+    rdfs:range :Country ;
+    rdfs:comment "country where the film was produced".
+
+:hasAgeRating a owl:ObjectProperty ;
+    rdfs:domain :Film ;
+    rdfs:range :AgeRating ;
+    rdfs:comment "Recommended age rating of a film".
+
+:hasContentWarning a owl:ObjectProperty ;
+    rdfs:domain :Film ;
+    rdfs:range :ContentWarning ;
+    rdfs:comment "Content warnings of a film".
+
+:hasOriginalLanguage a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:domain :Film ;
+    rdfs:range :Language ;
+    rdfs:comment "Original spoken language of a film".
+
+# Value restrictions
+## Countries
+:France a :Country.
+:Italy a :Country.
+:Netherlands a :Country.
+:Germany a :Country.
+
+## Age ratings
+:Age_AL a :AgeRating.
+:Age_6 a :AgeRating.
+:Age_9 a :AgeRating.
+:Age_12 a :AgeRating.
+:Age_14 a :AgeRating.
+:Age_16 a :AgeRating.
+:Age_18 a :AgeRating.
+
+## languages
+:English a :Language.
+:French a :Language.
+:Dutch a :Language.
+:German a :Language.

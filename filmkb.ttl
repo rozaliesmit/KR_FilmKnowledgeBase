@@ -236,6 +236,15 @@
                 owl:onClass :Film])];
     rdfs:comment "Franchise of three films".
 
+## User Classes
+:HorrorFan a owl:Class ; 
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf (:User
+            [ a owl:Restriction;
+                owl:onProperty :liked;
+                owl:minQualifiedCardinality "3"^^xsd:nonNegativeInteger;
+                owl:onClass :HorrorFilm])];
+    rdfs:comment "User that liked 3+ horror films".
 
 # Properties
 
@@ -343,12 +352,92 @@
 :hasPart a owl:ObjectProperty;
     rdfs:comment "Films that make up a franchise (inverse of partOfFranchise)".
 
+## User properties
+:watched a owl:ObjectProperty ; 
+    rdfs:domain :User;
+    rdfs:range :Film;
+    owl:propertyChainAxiom (:wroteReview :reviewOf);
+    rdfs:comment "User has seen the film".
+
+:liked a owl:ObjectProperty;
+    rdfs:subPropertyOf :watched; 
+    owl:propertyDisjointWith :disliked;
+    rdfs:comment "User liked the film".
+
+:favourited a owl:ObjectProperty;
+    rdfs:subPropertyOf :liked;
+    rdfs:comment "User marked film as favorite".
+
+:disliked a owl:ObjectProperty;
+    rdfs:subPropertyOf :watched;
+    rdfs:comment "User disliked the film".
+
+:onWatchlist a owl:ObjectProperty;
+    rdfs:domain :User;
+    rdfs:range :Film;
+    rdfs:comment "Films a user wants to watch".
+
+:wroteReview a owl:ObjectProperty, owl:InverseFunctionalProperty;
+    rdfs:domain :User;
+    rdfs:range :Review;
+    rdfs:comment "Links a user to the review they wrote".
+
+:reviewOf a owl:ObjectProperty, owl:FunctionalProperty;
+    rdfs:domain :Review;
+    rdfs:range :Film;
+    rdfs:comment "Film a review is about".
+
+:follows a owl:ObjectProperty, owl:IrreflexiveProperty;
+    rdfs:domain :User;
+    rdfs:range :User;
+    rdfs:comment "User follows another user".
+
+:speaksLanguage a owl:ObjectProperty;
+    rdfs:domain :User;
+    rdfs:range :Language;
+    rdfs:comment "Language a user understands".
+
+:dislikesGenre a owl:ObjectProperty;
+    rdfs:domain :User;
+    rdfs:range :Genre;
+    rdfs:comment "Genres a user doesn't want to watch".
+
+:hasMember a owl:ObjectProperty;
+    owl:inverseOf :memberOf;
+    rdfs:domain :Group;
+    rdfs:range :User;
+    rdfs:comment "Members of a group".
+
+:memberOf a owl:ObjectProperty;
+    rdfs:comment "Inverse of hasMember".
+
+:hasBirthYear a owl:DatatypeProperty, owl:FunctionalProperty;
+    rdfs:domain :User;
+    rdfs:range xsd:int;
+    rdfs:comment "Used for the user's age".
+
+:mightLike a owl:ObjectProperty;
+    rdfs:domain :User;
+    rdfs:range :Film;
+    owl:propertyChainAxiom (:liked :directedBy :directed) ;
+    rdfs:comment "Film by a director of a film the user liked".
+
+:likedByFollowee a owl:ObjectProperty;
+    rdfs:domain :User;
+    rdfs:range:Film;
+    owl:propertyChainAxiom (:follows :liked);
+    rdfs:comment "Film liked by someone the user follows".
+
 # Value restrictions
 ## Countries
 :France a :Country.
 :Italy a :Country.
 :Netherlands a :Country.
 :Germany a :Country.
+:USA a :Country.
+:Japan a :Country.
+[] a owl:AllDifferent;
+    owl:distinctMembers (:France :Italy :Netherlands :Germany :USA :Japan).
 
 ## Age ratings
 :Age_AL a :AgeRating.
@@ -358,9 +447,15 @@
 :Age_14 a :AgeRating.
 :Age_16 a :AgeRating.
 :Age_18 a :AgeRating.
+[] a owl:AllDifferent;
+    owl:distinctMembers (:Age_AL :Age_6 :Age_9 :Age_12 :Age_14 :Age_16 :Age_18).
 
 ## languages
 :English a :Language.
 :French a :Language.
 :Dutch a :Language.
 :German a :Language.
+:Japanese a :Language.
+:Italian a :Language.
+[] a owl:AllDifferent;
+    owl:distinctMembers (:English :French :Dutch :German :Japanese :Italian).

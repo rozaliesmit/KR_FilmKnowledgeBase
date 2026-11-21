@@ -6,7 +6,8 @@
 @prefix rdfs: <rdfs_namespace> .
 @prefix xsd: <datatype_namespace> .
 
-# Classes
+# Classes 
+## Main film and genre classes
 :Film a owl:Class ; # a is short for rdf:type
     owl:hasKey ( :hasTitle :hasReleaseYear) ;
     rdfs:comment "A movie/motion picture"   .
@@ -38,7 +39,7 @@
 :Group a owl:Class ;
     rdfs:comment "Group of users planning a movie night"    .
 
-# SubGenres
+## SubGenres
 :HorrorGenre a owl:Class ;
     rdfs:subClassOf :Genre ;
     rdfs:comment "Genre of films meant to frighten" .
@@ -110,7 +111,7 @@
                     owl:oneOf ( :France :Italy :Netherlands :Germany)]])];
     rdfs:comment "Film produced in a European country. More countries can be added".
 
-# Related movie types
+## Related movie type classes
 :Remake a owl:Class ; 
     owl:equivalentClass [ a owl:Class ;
         owl:intersectionOf ( :Film
@@ -135,7 +136,7 @@
                 owl:someValuesFrom :LiteraryWork])];
     rdfs:comment "Film based on a literary work".
 
-# Age ratings and content warnings
+## Age ratings and content warning classes
 :AgeRating a owl:Class ; 
     owl:equivalentClass[ a owl:Class ;
         owl:oneOf (:Age_AL :Age_6 :Age_9 :Age_12 :Age_14 :Age_16 :Age_18)];
@@ -180,8 +181,65 @@
                 owl:maxCardinality "0"^^xsd:nonNegativeInteger])];
     rdfs:comment "Film without any content warning". # use maxCardinality to indicate that the property has no values for this class and excludes subclasses that have non-zero values or no values
 
+# People classes
+:Director a owl:Class ; 
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf ( :Person
+            [ a owl:Restriction ;
+                owl:onProperty :directed ;
+                owl:someValuesFrom :Film])] ;
+    rdfs:comment "Person who directed at least one film".
+
+:Actor a owl:Class ; 
+    owl:equivalentClass [ a owl:Class;
+        owl:intersectionOf (:person
+        [ a owl:Restriction;
+            owl:onProperty :actedIn;
+            owl:someValuesFrom :Film])];
+    rdfs:comment "Person who acted in at least one film".
+
+:ActorDirector a owl:Class; 
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf ( :Actor :Director)];
+    rdfs:comment "Person who both acted and directed".
+
+:CastRole a owl:Class ;
+    rdfs:comment "Role played by an actor in a film".
+
+:LeadRole a owl:Class; 
+    rdfs:subclassOf :CastRole ;
+    rdfs:comment "Leading part in a film".
+
+:EnsembleFilm a owl:Class ;
+    owl:equivalentClass [ a owl:Class;
+        owl:intersectionOf (:Film
+            [ a owl:Restriction ; owl:onProperty :hasCastRole;
+                owl:minQualifiedCardinality "5"^^xsd:nonNegativeInteger;
+                owl:onClass :LeadRole])];
+    rdfs:comment "Film with at least five lead roles".
+ 
+:AuteurFilm a owl:Class ; 
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf (:Film
+            [ a owl:Restriction;
+                owl:onProperty :directedAndWrittenBy;
+                owl:someValuesFrom :Person])];
+    rdfs:comment "Film written and directed by the same person".
+
+## Franchise class 
+:Trilogy a owl:Class ; 
+    owl:equivalentClass [ a owl:Class;
+        owl:intersectionOf ( :Franchise
+            [ a owl:Restriction;
+                owl:onProperty :hasPart;
+                owl:qualifiedCardinality "3"^^xsd:nonNegativeInteger;
+                owl:onClass :Film])];
+    rdfs:comment "Franchise of three films".
+
+
 # Properties
 
+## Main movie properties
 :hasReleaseYear a owl:DatatypeProperty , owl:FunctionalProperty ;
     rdfs:domain :Film ;
     rdfs:range xsd:int ;
@@ -239,6 +297,51 @@
     rdfs:domain :Film ;
     rdfs:range :Language ;
     rdfs:comment "Original spoken language of a film".
+
+## People properties
+:directed a owl:ObjectProperty ;
+    rdfs:comment "Films a person directed (inverse of directedBy)".
+
+:directedBy a owl:ObjectProperty ;
+    owl:inverseOf :directed;
+    rdfs:domain :Film ;
+    rdfs:range :Person ;
+    rdfs:comment "Director of a film".
+
+:actedIn a owl:ObjectProperty ; 
+    rdfs:domain :Person ;
+    rdfs:range :Film ;
+    owl:propertyChainAxiom ([owl:inverseOf :playedBy] [owl:inverseOf :hasCastRole]);
+    rdfs:comment "Films a person acted in; derived from cast roles and playedBy".
+
+:playedBy a owl:ObjectProperty , owl:FunctionalProperty;
+    rdfs:domain :CastRole ;
+    rdfs:range :Person ;
+    rdfs:comment "Actor who plays a role in a film".
+
+:hasCastRole a owl:ObjectProperty ;
+    rdfs:domain :Film;
+    rdfs:range :CastRole;
+    rdfs:comment "Links a film to its cast roles".
+
+:writtenBy a owl:ObjectProperty ;
+    rdfs:domain :Film;
+    rdfs:range :Person;
+    rdfs:comment "Screenwriter of a film".
+
+:directedAndWrittenBy a owl:ObjectProperty;
+    rdfs:subPropertyOf :directedBy , :writtenBy;
+    rdfs:comment "Film is both written and directed by the same person".
+
+## Franchise properties
+:partOfFranchise a owl:ObjectProperty;
+    owl:inverseOf :hasPart;
+    rdfs:domain :Film;
+    rdfs:range :Franchise;
+    rdfs:comment "Franchise a film belongs to".
+
+:hasPart a owl:ObjectProperty;
+    rdfs:comment "Films that make up a franchise (inverse of partOfFranchise)".
 
 # Value restrictions
 ## Countries

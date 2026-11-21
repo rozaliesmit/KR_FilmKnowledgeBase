@@ -8,8 +8,12 @@
 
 # Classes
 :Film a owl:Class ; # a is short for rdf:type
-    rdfs:comment "A movie/motion picture"
-    owl:hasKey ( :hasTitle :hasReleaseYear) . 
+    owl:hasKey ( :hasTitle :hasReleaseYear) ;
+    rdfs:comment "A movie/motion picture"   .
+
+:LiteraryWork a owl:Class;
+    owl:disjointWith :Film ;
+    rdfs:comment "Book, play or story a film can be based on".
 
 :Genre a owl:Class ; 
     rdfs:comment "Category of film content" .
@@ -36,16 +40,91 @@
 
 # SubGenres
 :HorrorGenre a owl:Class ;
-    rdfs:comment "Genre of films meant to frighten" ;
-    rdfs:subClassOf :Genre .
+    rdfs:subClassOf :Genre ;
+    rdfs:comment "Genre of films meant to frighten" .
 
 :SlasherGenre a owl:Class ;
+    rdfs:subClassOf :HorrorGenre ;
     rdfs:comment "Subgenre of horror centered on a killer stalking victims" .
-    rdfs:subClassOf :HorrorGenre    .
 
 :ComedyGenre a owl:Class ; 
-    rdfs:comment "genre of films meant to amuse"
-    rdfs:subClassOf :Genre .
+    rdfs:subClassOf :Genre ;
+    rdfs:comment "genre of films meant to amuse" .
+
+:HorrorFilm a owl:Class ;
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf ( :Film 
+            [ a owl:Restriction ;
+                owl:onProperty :hasGenre ;
+                owl:someValuesFrom :HorrorGenre
+            ]
+        )] ;
+    rdfs:comment "Film that has at least one horror (sub)genre)" .
+
+:ComedyFilm a owl:Class ;
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf ( :Film
+            [ a owl:Restriction ;
+                owl:onProperty :hasGenre ;
+                owl:someValuesFrom :ComedyGenre
+            ]
+        )] ;
+    rdfs:comment "Film with a comedy genre" .
+
+:HorrorComedy a owl:Class ; 
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf ( :HorrorFilm :ComedyFilm )] ;
+        rdfs:comment "Film that combines horror and comedy" .
+
+:Documentary a owl:Class ;
+    rdfs:subClassOf :Film ;
+    owl:disjointWith :FictionFilm ;
+    rdfs:comment "Non-fiction film about real events or people" .
+
+:FictionFilm a owl:Class ;
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf ( :Film 
+            [ a owl:Class ;
+                owl:complementOf :Documentary 
+        ])] ;
+    rdfs:comment "All films that are not documentaries" .
+
+:ShortFilm a owl:Class ;
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf ( :Film
+            [ a owl:Restriction ;
+                owl:onProperty :hasRuntime ;
+                owl:someValuesFrom [ a rdfs:Datatype ;
+                    owl:onDatatype xsd:int ;
+                    owl:withRestrictions ( [ xsd:maxExclusive "40"^^xsd:int ])
+                ]])] ;
+
+    rdfs:comment "Film shorter than 40 minutes" .
+
+# Related movie types
+:Remake a owl:Class ; 
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf ( :Film
+            [ a owl:Restriction ; 
+                owl:onProperty :isRemakeOf ;
+                owl:someValuesFrom :Film])] ;
+    rdfs:comment "New version of an earlier film"  .
+
+:Sequel a owl:Class ;
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf ( :Film
+            [ a owl:Restriction ;
+                owl:onProperty :isSequelOf ;
+                owl:someValuesFrom :Film])];
+    rdfs:comment "Film that continues the story of an earlier film".
+
+:Adaptation a owl:Class ; 
+    owl:equivalentClass [ a owl:Class ;
+        owl:intersectionOf ( :Film
+            [ a owl:Restriction ;
+                owl:onProperty :basedOn ;
+                owl:someValuesFrom :LiteraryWork])];
+    rdfs:comment "Film based on a literary work".
 
 
 # Properties
@@ -53,3 +132,31 @@
     rdfs:comment "Title of a film" ;
     rdfs:domain :Film ; 
     rdfs:range xsd:string .
+
+:hasRuntime a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:comment "Runtime of a film in minutes" ;
+    rdfs:domain :Film ; 
+    rdfs:range xsd:int .
+
+:isRemakeOf a owl:ObjectProperty , owl:IrreflexiveProperty ;
+    owl:inverseOf :hasRemake ;
+    rdfs:domain :Film ;
+    rdfs:range :Film ;
+    rdfs:comment "Links remake to its original film"    .
+
+:hasRemake a owl:ObjectProperty ;
+    rdfs:comment "inverse of isRemakeOf"   .
+
+:isSequelOf a owl:ObjectProperty , owl:IrreflexiveProperty ;
+    rdfs:subPropertyOf :comesAfter ; 
+    rdfs:comment "Sequel relation between two films"    .
+
+:comesAfter a owl:ObjectProperty , owl:TransitiveProperty ;
+    rdfs:domain :Film ; 
+    rdfs:range :Film ;
+    rdfs:comment "Film comes after another one in a franchise / trilogy ".
+
+:basedOn a owl:ObjectProperty ;
+    rdfs:domain :Film ;
+    rdfs:range :LiteraryWork ;
+    rdfs:comment "Literary work a film is adapted from"

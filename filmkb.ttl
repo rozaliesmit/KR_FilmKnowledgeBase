@@ -1,0 +1,55 @@
+# Film Knowledge Base Data
+
+@prefix : <default_namespace> .
+@prefix owl: <owl_axiom_namespace> .
+@prefix rdf: <list_base_namespace> .
+@prefix rdfs: <rdfs_namespace> .
+@prefix xsd: <datatype_namespace> .
+
+# Classes
+:Film a owl:Class ; # a is short for rdf:type
+    rdfs:comment "A movie/motion picture"
+    owl:hasKey ( :hasTitle :hasReleaseYear) . 
+
+:Genre a owl:Class ; 
+    rdfs:comment "Category of film content" .
+
+:Country a owl:Class ;
+    rdfs:comment "Country of production" .
+
+:Language a owl:Class ;
+    rdfs:comment "Spoken language of a film or user" .
+
+:Person a owl:Class .
+
+:Franchise a owl:Class ;
+    rdfs:comment "Series of related films"  .
+
+:User a owl:Class ;
+    rdfs:comment "Person with account on platform"  .
+
+:Review a owl:Class ;
+    rdfs:comment "Review of a film by a user"   .
+
+:Group a owl:Class ;
+    rdfs:comment "Group of users planning a movie night"    .
+
+# SubGenres
+:HorrorGenre a owl:Class ;
+    rdfs:comment "Genre of films meant to frighten" ;
+    rdfs:subClassOf :Genre .
+
+:SlasherGenre a owl:Class ;
+    rdfs:comment "Subgenre of horror centered on a killer stalking victims" .
+    rdfs:subClassOf :HorrorGenre    .
+
+:ComedyGenre a owl:Class ; 
+    rdfs:comment "genre of films meant to amuse"
+    rdfs:subClassOf :Genre .
+
+
+# Properties
+:hasTitle a owl:DatatypeProperty ;
+    rdfs:comment "Title of a film" ;
+    rdfs:domain :Film ; 
+    rdfs:range xsd:string .

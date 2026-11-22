@@ -1,10 +1,13 @@
 # Film Knowledge Base Data
 
-@prefix : <http://example.org/default_namespace#> .
-@prefix owl: <http://example.org/owl_axiom_namespace#> .
-@prefix rdf: <http://example.org/list_base_namespace#> .
-@prefix rdfs: <http://example.org/rdfs_namespace#> .
-@prefix xsd: <http://example.org/datatype_namespace#> .
+@prefix :     <http://example.org/filmkb#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/filmkb> a owl:Ontology ;
+    rdfs:label "Film Knowledge Base Data" .
 
 # Classes 
 ## Main film and genre classes
@@ -159,7 +162,7 @@
 :MildWarning a owl:Class ;
     rdfs:subClassOf :ContentWarning ;
     owl:disjointWith :SevereWarning ;
-    rdfs:content "Content warning of low intensity".
+    rdfs:comment "Content warning of low intensity".
 
 :SevereWarning a owl:Class ; 
     rdfs:subClassOf :ContentWarning ;
@@ -192,7 +195,7 @@
 
 :Actor a owl:Class ; 
     owl:equivalentClass [ a owl:Class;
-        owl:intersectionOf (:person
+        owl:intersectionOf (:Person
         [ a owl:Restriction;
             owl:onProperty :actedIn;
             owl:someValuesFrom :Film])];
@@ -207,7 +210,7 @@
     rdfs:comment "Role played by an actor in a film".
 
 :LeadRole a owl:Class; 
-    rdfs:subclassOf :CastRole ;
+    rdfs:subClassOf :CastRole ;
     rdfs:comment "Leading part in a film".
 
 :EnsembleFilm a owl:Class ;
@@ -263,6 +266,11 @@
     rdfs:comment "Runtime of a film in minutes" ;
     rdfs:domain :Film ; 
     rdfs:range xsd:int .
+
+:hasGenre a owl:ObjectProperty ;
+    rdfs:domain :Film ;
+    rdfs:range :Genre ;
+    rdfs:comment "Genre of a film" .
 
 :isRemakeOf a owl:ObjectProperty , owl:IrreflexiveProperty ;
     owl:inverseOf :hasRemake ;

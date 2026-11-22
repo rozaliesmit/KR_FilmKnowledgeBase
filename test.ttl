@@ -1,0 +1,86 @@
+#test file
+
+@prefix :     <http://example.org/filmkb#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/filmkb/example> a owl:Ontology ;
+    owl:imports <http://example.org/filmkb> .
+
+# People
+:Alice a :Person.
+:Bob a :Person.
+:Charlie a :Person.
+:RidleyScott a :Person.
+:JamesCameron  a :Person .
+:DavidFincher  a :Person .
+:WesCraven a :Person.
+
+# Films
+:Alien a :Film ;
+    :hasTitle "Alien" ; :hasReleaseYear "1979"^^xsd:int ;
+    :hasGenre :genre_horror ;
+    :directedBy :RidleyScott ;
+    :hasAgeRating :Age_16 ; :producedIn :USA ;
+    :hasOriginalLanguage :English ;
+    :partOfFranchise :AlienSaga .
+
+:Aliens a :Film ;
+    :hasTitle "Aliens" ; :hasReleaseYear "1986"^^xsd:int ;
+    :hasGenre :genre_horror ;
+    :directedBy :JamesCameron ;
+    :hasAgeRating :Age_16 ; :producedIn :USA ;
+    :isSequelOf :Alien ;
+    :partOfFranchise :AlienSaga .
+
+:Alien3 a :Film ;
+    :hasTitle "Alien 3" ; :hasReleaseYear "1992"^^xsd:int ;
+    :hasGenre :genre_horror ;
+    :directedBy :DavidFincher ;
+    :hasAgeRating :Age_16 ; :producedIn :USA ;
+    :isSequelOf :Aliens ;
+    :partOfFranchise :AlienSaga .
+
+:BladeRunner a :Film ;
+    :hasTitle "Blade Runner" ; :hasReleaseYear "1982"^^xsd:int ;
+    :hasGenre :genre_scifi ;
+    :directedBy :RidleyScott ;
+    :hasAgeRating :Age_16 ; :producedIn :USA .
+
+:Scream a :Film ;
+    :hasTitle "Scream" ; :hasReleaseYear "1996"^^xsd:int ;
+    :hasGenre :genre_slasher;
+    :directedBy :WesCraven ;
+    :hasAgeRating :Age_16 ; :producedIn :USA .
+
+# Genres
+:genre_scifi a :Genre .
+:genre_horror  a :HorrorGenre .
+:genre_slasher a :SlasherGenre .
+
+# Franchise
+:AlienSaga a :Franchise ;
+    :hasPart :Alien , :Aliens , :Alien3 ;
+    # closure: exactly these three films => Trilogy (CQ15)
+    a [ a owl:Restriction ; owl:onProperty :hasPart ;
+        owl:maxQualifiedCardinality "3"^^xsd:nonNegativeInteger ; owl:onClass :Film ] .
+
+# USers
+:David a :User ;
+    :hasBirthYear "2000"^^xsd:int ;
+    :speaksLanguage :English , :Dutch ;
+    :favourited :Aliens ;                     
+    :liked :Scream , :Alien ;                
+    :wroteReview :review1 ;                        
+    :onWatchlist :GhostPicnic .
+
+# Reviews
+:review1 a :Review ; :reviewOf :Aliens .
+
+:Eva a :User ;
+    :hasBirthYear "2005"^^xsd:int ;
+    :speaksLanguage :English ;
+    :follows :David ;                                 # => likedByFollowee (CQ26)
+    :liked :BladeRunner .

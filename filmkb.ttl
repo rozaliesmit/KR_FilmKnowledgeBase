@@ -1,10 +1,10 @@
 # Film Knowledge Base Data
 
-@prefix : <default_namespace> .
-@prefix owl: <owl_axiom_namespace> .
-@prefix rdf: <list_base_namespace> .
-@prefix rdfs: <rdfs_namespace> .
-@prefix xsd: <datatype_namespace> .
+@prefix : <http://example.org/default_namespace#> .
+@prefix owl: <http://example.org/owl_axiom_namespace#> .
+@prefix rdf: <http://example.org/list_base_namespace#> .
+@prefix rdfs: <http://example.org/rdfs_namespace#> .
+@prefix xsd: <http://example.org/datatype_namespace#> .
 
 # Classes 
 ## Main film and genre classes
@@ -424,7 +424,7 @@
 
 :likedByFollowee a owl:ObjectProperty;
     rdfs:domain :User;
-    rdfs:range:Film;
+    rdfs:range :Film;
     owl:propertyChainAxiom (:follows :liked);
     rdfs:comment "Film liked by someone the user follows".
 
